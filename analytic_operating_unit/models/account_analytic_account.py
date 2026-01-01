@@ -7,10 +7,7 @@ from odoo import fields, models
 class AccountAnalyticAccount(models.Model):
     _inherit = "account.analytic.account"
 
-    operating_unit_ids = fields.Many2many(
+    operating_unit_id = fields.Many2one(
         comodel_name="operating.unit",
         string="Operating Units",
-        relation="analytic_account_operating_unit_rel",
-        column1="analytic_account_id",
-        column2="operating_unit_id",
     )
