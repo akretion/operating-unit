@@ -42,7 +42,10 @@ class SaleOrder(models.Model):
     @api.constrains("team_id", "operating_unit_id")
     def _check_team_operating_unit(self):
         for rec in self:
-            if rec.team_id and rec.team_id.operating_unit_id != rec.operating_unit_id:
+            if (
+                rec.team_id.operating_unit_id
+                and rec.team_id.operating_unit_id != rec.operating_unit_id
+            ):
                 raise ValidationError(
                     _(
                         "Configuration error. The Operating "
