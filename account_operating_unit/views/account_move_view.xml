@@ -71,10 +71,7 @@
                 position="attributes"
             >
                 <attribute name="domain">
-                    ['|', ('company_id', '=', False), ('company_id', '=',
-                    parent.company_id), '|', ('operating_unit_ids', '=',
-                    context.get('operating_unit_id', False)), ('operating_unit_ids',
-                    '=', False)]
+                    [('operating_unit_id', '=', operating_unit_id)]
                 </attribute>
             </xpath>
             <xpath
@@ -101,10 +98,7 @@
                 position="attributes"
             >
                 <attribute name="domain">
-                    ['|', ('company_id', '=', parent.company_id), ('company_id', '=',
-                    False), '|', ('operating_unit_ids', '=',
-                    context.get('default_operating_unit_id', False)),
-                    ('operating_unit_ids', '=', False)]
+                    [('operating_unit_id', '=', operating_unit_id)]
                 </attribute>
             </xpath>
             <xpath
@@ -112,9 +106,7 @@
                 position="attributes"
             >
                 <attribute name="domain">
-                    ['|', ('operating_unit_ids', '=',
-                    context.get('default_operating_unit_id', False)),
-                    ('operating_unit_ids', '=', False)]
+                    [('operating_unit_id', '=', operating_unit_id)]
                 </attribute>
             </xpath>
         </field>
