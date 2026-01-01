@@ -11,10 +11,15 @@ class SaleOrder(models.Model):
 
     @api.model
     def _default_operating_unit(self):
+        operating_unit = False
         team = self.env["crm.team"]._get_default_team_id()
         if team.operating_unit_id:
-            return team.operating_unit_id
-        return self.env.user.default_operating_unit_id
+            operating_unit = team.operating_unit_id
+        operating_unit = self.env.user.default_operating_unit_id
+        if operating_unit.company_id == self.env.company:
+            return operating_unit
+        else:
+            return False
 
     operating_unit_id = fields.Many2one(
         comodel_name="operating.unit",
