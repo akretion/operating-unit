@@ -17,10 +17,12 @@
     "data": [
         "security/operating_unit_security.xml",
         "security/ir.model.access.csv",
-        "data/operating_unit_data.xml",
         "view/operating_unit_view.xml",
         "view/res_users_view.xml",
     ],
-    "demo": ["demo/operating_unit_demo.xml"],
+    "demo": [
+        "data/operating_unit_data.xml",  # unwanted data move to demo
+        "demo/operating_unit_demo.xml",
+    ],
     "installable": True,
 }
