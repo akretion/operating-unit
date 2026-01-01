@@ -2,7 +2,8 @@
 # © 2019 Serpent Consulting Services Pvt. Ltd.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
-from odoo import fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class AccountMoveLine(models.Model):
@@ -12,6 +13,18 @@ class AccountMoveLine(models.Model):
         related="move_id.operating_unit_id",
         store=True,
     )
+
+    @api.constrains("journal_id", "analytic_account_id")
+    def _check_analytic_account(self):
+        for record in self:
+            if record.analytic_account_id and (
+                record.journal_id.operating_unit_id
+                != record.analytic_account_id.operating_unit_id
+            ):
+                raise ValidationError(_(
+                    "Le compte analytic doit appartenir à la même Unité Opérationnel"
+                    "que celle du journal"
+                    ))
 
 
 class AccountMove(models.Model):
