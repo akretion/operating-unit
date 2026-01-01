@@ -18,7 +18,6 @@
         "security/account_security.xml",
         "views/account_move_view.xml",
         "views/account_journal_view.xml",
-        "views/company_view.xml",
         "views/account_payment_view.xml",
         "views/account_invoice_report_view.xml",
     ],
