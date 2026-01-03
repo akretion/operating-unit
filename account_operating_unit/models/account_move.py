@@ -17,14 +17,16 @@ class AccountMoveLine(models.Model):
     @api.constrains("journal_id", "analytic_account_id")
     def _check_analytic_account(self):
         for record in self:
-            if record.analytic_account_id and (
+            if record.analytic_account_id.operating_unit_id and (
                 record.journal_id.operating_unit_id
                 != record.analytic_account_id.operating_unit_id
             ):
-                raise ValidationError(_(
-                    "Le compte analytic doit appartenir à la même Unité Opérationnel"
-                    "que celle du journal"
-                    ))
+                raise ValidationError(
+                    _(
+                        "Le compte analytic doit appartenir à la même Unité Opérationnel"
+                        "que celle du journal"
+                    )
+                )
 
 
 class AccountMove(models.Model):
