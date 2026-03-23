@@ -8,7 +8,18 @@ from odoo.exceptions import UserError
 class StockLocation(models.Model):
     _inherit = "stock.location"
 
-    operating_unit_id = fields.Many2one("operating.unit", "Operating Unit")
+    operating_unit_id = fields.Many2one(
+        "operating.unit",
+        "Operating Unit",
+        compute="_compute_operating_unit_id",
+        store=True,
+        readonly=False,
+    )
+
+    @api.depends("location_id")
+    def _compute_operating_unit_id(self):
+        for record in self:
+            record.operating_unit_id = record.location_id.operating_unit_id
 
     @api.constrains("operating_unit_id")
     def _check_warehouse_operating_unit(self):
