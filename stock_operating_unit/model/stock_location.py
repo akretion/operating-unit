@@ -19,7 +19,13 @@ class StockLocation(models.Model):
     @api.depends("location_id")
     def _compute_operating_unit_id(self):
         for record in self:
-            record.operating_unit_id = record.location_id.operating_unit_id
+            if record.usage not in ("supplier", "customer"):
+                if record.location_id.operating_unit_id:
+                    record.operating_unit_id = record.location_id.operating_unit_id
+                else:
+                    wh = record.get_warehouse()
+                    if wh.operating_unit_id:
+                        record.operating_unit_id = wh.operating_unit_id
 
     @api.constrains("operating_unit_id")
     def _check_warehouse_operating_unit(self):
@@ -47,17 +53,11 @@ class StockLocation(models.Model):
     @api.constrains("operating_unit_id")
     def _check_required_operating_unit(self):
         for rec in self:
-            if rec.usage not in ("supplier", "customer") and not rec.operating_unit_id:
-                raise UserError(
-                    _(
-                        "Configuration error. Internal locations should have an operating unit"
-                    )
-                )
             if rec.usage in ("supplier", "customer") and rec.operating_unit_id:
                 raise UserError(
                     _(
                         "Configuration error. The operating unit should be "
-                        "assigned to internal locations only."
+                        "not assigned to supplier and customer locations."
                     )
                 )
 
