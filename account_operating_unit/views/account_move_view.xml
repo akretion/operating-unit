@@ -71,7 +71,7 @@
                 position="attributes"
             >
                 <attribute name="domain">
-                    [('operating_unit_id', '=', parent.operating_unit_id)]
+                    ['|', ('operating_unit_id', '=', parent.operating_unit_id), ('operating_unit_id', '=', False)]
                 </attribute>
             </xpath>
             <xpath
@@ -79,7 +79,7 @@
                 position="attributes"
             >
                 <attribute name="domain">
-                    [('operating_unit_id', '=', parent.operating_unit_id)]
+                    ['|', ('operating_unit_id', '=', parent.operating_unit_id), ('operating_unit_id', '=', False)]
                 </attribute>
             </xpath>
             <xpath
@@ -98,7 +98,7 @@
                 position="attributes"
             >
                 <attribute name="domain">
-                    [('operating_unit_id', '=', parent.operating_unit_id)]
+                    ['|', ('operating_unit_id', '=', parent.operating_unit_id), ('operating_unit_id', '=', False)]
                 </attribute>
             </xpath>
             <xpath
@@ -106,7 +106,7 @@
                 position="attributes"
             >
                 <attribute name="domain">
-                    [('operating_unit_id', '=', parent.operating_unit_id)]
+                    ['|', ('operating_unit_id', '=', parent.operating_unit_id), ('operating_unit_id', '=', False)]
                 </attribute>
             </xpath>
         </field>
