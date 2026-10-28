@@ -49,14 +49,20 @@ class AccountMove(models.Model):
             if move.journal_id.operating_unit_id:
                 move.operating_unit_id = move.journal_id.operating_unit_id
 
-    @api.model_create_multi
-    def create(self, vals_list):
+    @api.model
+    def _move_autocomplete_invoice_lines_create(self, vals_list):
+        # The journal of the move is generally resolved by its default value
+        # while the invoice lines are autocompleted, i.e. inside the super()
+        # call below: read the operating unit from the journal once the values
+        # are complete, and leave it empty when the journal has none so that it
+        # can still be set by hand.
+        vals_list = super()._move_autocomplete_invoice_lines_create(vals_list)
         for vals in vals_list:
             if not vals.get("operating_unit_id") and vals.get("journal_id"):
                 journal = self.env["account.journal"].browse(vals["journal_id"])
                 if journal.operating_unit_id:
                     vals["operating_unit_id"] = journal.operating_unit_id.id
-        return super().create(vals_list)
+        return vals_list
 
     def write(self, vals):
         if "operating_unit_id" in vals:
