@@ -49,6 +49,20 @@ class AccountMove(models.Model):
             if move.journal_id.operating_unit_id:
                 move.operating_unit_id = move.journal_id.operating_unit_id
 
+    @api.constrains("operating_unit_id", "journal_id")
+    def _check_operating_unit_journal(self):
+        for move in self:
+            journal_ou = move.journal_id.operating_unit_id
+            if journal_ou and move.operating_unit_id != journal_ou:
+                raise ValidationError(
+                    _(
+                        "The operating unit of the entry must be the one of its "
+                        "journal %(journal)s. Only a journal without operating "
+                        "unit allows to set it manually.",
+                        journal=move.journal_id.display_name,
+                    )
+                )
+
     @api.model
     def _move_autocomplete_invoice_lines_create(self, vals_list):
         # The journal of the move is generally resolved by its default value

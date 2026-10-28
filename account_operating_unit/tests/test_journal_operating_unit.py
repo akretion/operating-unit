@@ -3,6 +3,7 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 import odoo.tests
+from odoo.exceptions import ValidationError
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
@@ -14,8 +15,8 @@ class TestJournalOperatingUnit(AccountTestInvoicingCommon):
     The journal may be given in the values, come from the context or be the
     default one of the journal field: in the three cases the operating unit has
     to end up on the move and on its lines. Journal entries are covered as well
-    as invoices, and a journal without operating unit leaves the move free for a
-    manual value.
+    as invoices. A journal with an operating unit imposes it on the move, while
+    a journal without operating unit leaves the move free for a manual value.
     """
 
     def setUp(self):
@@ -144,12 +145,25 @@ class TestJournalOperatingUnit(AccountTestInvoicingCommon):
         entry.operating_unit_id = self.ou1
         self._assert_operating_unit(entry, self.ou1)
 
-    def test_explicit_operating_unit_wins_over_journal(self):
-        journal = self._create_journal("general", "TJE04", self.b2b)
-        entry = self.move_model.create(
-            self._prepare_entry_vals(
-                journal_id=journal.id, operating_unit_id=self.b2c.id
+    def test_operating_unit_cannot_differ_from_journal(self):
+        """A journal with an operating unit imposes it on the move: another
+        value is refused."""
+        journal = self._create_journal("general", "TJO01", self.b2b)
+        entry = self.move_model.create(self._prepare_entry_vals(journal_id=journal.id))
+        with self.assertRaises(ValidationError):
+            entry.operating_unit_id = self.b2c
+
+    def test_operating_unit_cannot_be_unset_when_journal_has_one(self):
+        journal = self._create_journal("general", "TJO02", self.b2c)
+        entry = self.move_model.create(self._prepare_entry_vals(journal_id=journal.id))
+        with self.assertRaises(ValidationError):
+            entry.operating_unit_id = False
+
+    def test_operating_unit_different_from_journal_at_creation(self):
+        journal = self._create_journal("purchase", "TJP01", self.b2b)
+        with self.assertRaises(ValidationError):
+            self.move_model.with_context(default_move_type="in_invoice").create(
+                self._prepare_invoice_vals(
+                    journal_id=journal.id, operating_unit_id=self.b2c.id
+                )
             )
-        )
-        self.assertEqual(entry.journal_id, journal)
-        self._assert_operating_unit(entry, self.b2c)
