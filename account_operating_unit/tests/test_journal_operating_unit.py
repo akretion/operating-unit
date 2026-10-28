@@ -68,8 +68,8 @@ class TestJournalOperatingUnit(AccountTestInvoicingCommon):
         vals.update(kwargs)
         return vals
 
-    def _prepare_invoice_vals(self):
-        return {
+    def _prepare_invoice_vals(self, **kwargs):
+        vals = {
             "partner_id": self.partner_a.id,
             "move_type": "in_invoice",
             "invoice_line_ids": [
@@ -84,6 +84,8 @@ class TestJournalOperatingUnit(AccountTestInvoicingCommon):
                 )
             ],
         }
+        vals.update(kwargs)
+        return vals
 
     def _assert_operating_unit(self, move, operating_unit):
         self.assertEqual(len(move.line_ids), 2)
@@ -93,7 +95,7 @@ class TestJournalOperatingUnit(AccountTestInvoicingCommon):
     def test_invoice_operating_unit_from_explicit_journal(self):
         journal = self._create_journal("purchase", "TJI01", self.b2b)
         invoice = self.move_model.with_context(default_move_type="in_invoice").create(
-            dict(self._prepare_invoice_vals(), journal_id=journal.id)
+            self._prepare_invoice_vals(journal_id=journal.id)
         )
         self.assertEqual(invoice.journal_id, journal)
         self._assert_operating_unit(invoice, self.b2b)
