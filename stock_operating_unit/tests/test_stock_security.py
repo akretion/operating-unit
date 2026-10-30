@@ -92,12 +92,23 @@ class TestStockPicking(test_stock_ou.TestStockOperatingUnit):
             "User 2 should not be able to list the "
             "stock moves assigned to picking 1.",
         )
-        # User 2 can list the picking 1
+        # Nor the picking 1 itself: its warehouse belongs to the main OU
         picking_ids = (
             self.PickingObj.with_user(self.user2_id)
             .search([("id", "=", self.picking_in1.id)])
             .ids
         )
         self.assertEqual(
-            len(picking_ids), 1, "User 2 should be able to list" "the picking 1."
+            picking_ids,
+            [],
+            "User 2 should not be able to list" "the picking 1.",
+        )
+        # User 2 can list the picking 2, created on its own operating unit
+        picking_ids = (
+            self.PickingObj.with_user(self.user2_id)
+            .search([("id", "=", self.picking_in2.id)])
+            .ids
+        )
+        self.assertEqual(
+            len(picking_ids), 1, "User 2 should be able to list" "the picking 2."
         )

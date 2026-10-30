@@ -26,6 +26,7 @@ class TestStockOperatingUnit(common.TestStockCommon):
         b2c_wh = self.env.ref("stock_operating_unit.stock_warehouse_b2c")
         b2c_wh.lot_stock_id.write({"operating_unit_id": self.b2c.id})
         self.location_b2c_id = b2c_wh.lot_stock_id.id
+        self.b2c_input_location_id = b2c_wh.wh_input_stock_loc_id.id
         self.b2c_type_in_id = b2c_wh.in_type_id.id
         self.b2c_type_int_id = b2c_wh.int_type_id.id
         # Create users
@@ -41,14 +42,12 @@ class TestStockOperatingUnit(common.TestStockCommon):
         # Create Incoming Shipments
         self.picking_in1 = self._create_picking(
             self.user1_id,
-            self.b2c.id,
-            self.b2c_type_in_id,
+            self.picking_type_in,
             self.supplier_location,
             self.stock_location,
         )
         self.picking_in2 = self._create_picking(
             self.user2_id,
-            self.b2c.id,
             self.b2c_type_in_id,
             self.supplier_location,
             self.location_b2c_id,
@@ -56,9 +55,8 @@ class TestStockOperatingUnit(common.TestStockCommon):
         # Create Internal Shipment
         self.picking_int = self._create_picking(
             self.user1_id,
-            self.b2c.id,
             self.b2c_type_int_id,
-            self.stock_location,
+            self.b2c_input_location_id,
             self.location_b2c_id,
         )
 
@@ -79,14 +77,17 @@ class TestStockOperatingUnit(common.TestStockCommon):
         )
         return user.id
 
-    def _create_picking(self, user_id, ou_id, picking_type, src_loc_id, dest_loc_id):
-        """Create a Picking."""
+    def _create_picking(self, user_id, picking_type, src_loc_id, dest_loc_id):
+        """Create a Picking.
+
+        The operating unit of the picking is not given: it is derived from the
+        warehouse of its picking type.
+        """
         picking = self.PickingObj.with_user(user_id).create(
             {
                 "picking_type_id": picking_type,
                 "location_id": src_loc_id,
                 "location_dest_id": dest_loc_id,
-                "operating_unit_id": ou_id,
             }
         )
         self.MoveObj.with_user(user_id).create(

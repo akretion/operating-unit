@@ -34,8 +34,13 @@ class TestInvoiceOperatingUnit(test_ou.TestAccountOperatingUnit):
 
         register_payments.action_create_payments()
         payment = self.payment_model.search([], order="id desc", limit=1)
-        # Validate that inter OU balance move lines are created
-        self.assertEqual(len(payment.move_id.line_ids), 4)
+        # one debit line and one credit line, both on the operating unit of the
+        # journal: no cross operating unit balancing entry is generated anymore
+        self.assertEqual(len(payment.move_id.line_ids), 2)
+        self.assertEqual(
+            payment.move_id.line_ids.operating_unit_id,
+            self.cash_journal_ou1.operating_unit_id,
+        )
         self.assertAlmostEqual(payment.amount, 115000)
         self.assertEqual(payment.state, "posted")
         self.assertEqual(self.invoice.payment_state, "paid")
@@ -66,13 +71,9 @@ class TestInvoiceOperatingUnit(test_ou.TestAccountOperatingUnit):
 
         register_payments.action_create_payments()
         payments = self.payment_model.search([], order="id desc", limit=2)
-        inter_ou_moves = self.move_model.search(
-            [("ref", "=", "Inter OU Balancing")], order="id desc", limit=2
-        )
-        self.assertEqual(sum(inter_ou_moves[0].mapped("line_ids.debit")), 115000)
-        self.assertEqual(sum(inter_ou_moves[1].mapped("line_ids.debit")), 115000)
         for payment in payments:
-            # Validate that inter OU balance move lines are created
+            # one debit line and one credit line, no cross operating unit
+            # balancing entry is generated anymore
             self.assertEqual(len(payment.move_id.line_ids), 2)
             self.assertAlmostEqual(payment.amount, 115000)
             self.assertEqual(payment.state, "posted")

@@ -78,20 +78,6 @@ class TestAccountOperatingUnit(AccountTestInvoicingCommon):
                 "company_id": self.company.id,
             }
         )
-        # Create Inter-OU Clearing - test account
-        user_type = self.env.ref("account.data_account_type_equity")
-        self.inter_ou_account_id = self.account_model.create(
-            {
-                "name": "Inter-OU Clearing",
-                "code": "test_inter_ou",
-                "user_type_id": user_type.id,
-                "company_id": self.company.id,
-            }
-        )
-        # Assign the Inter-OU Clearing account to the company
-        self.company.inter_ou_clearing_account_id = self.inter_ou_account_id.id
-        self.company.ou_is_self_balanced = True
-
         # Create user2
         self.user2_id = self.res_users_model.with_context(
             {"no_reset_password": True}
